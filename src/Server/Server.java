@@ -5,14 +5,9 @@ package Server;
  * @author Erick Pereira, Felipe Campos, Guilherme Rodrigues, Lucas Campanelli, Paulo Silveira e Ronaldo Arley
  */
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 import java.net.ServerSocket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Server {
     
@@ -36,12 +31,31 @@ public class Server {
         }
     }
     
+    // Método responsável por verificar se o cliente mandou alguma mensagem de gatilho para fechar o programa
+    private boolean checkExit(String msg){
+        if(msg.trim().equalsIgnoreCase("sair") ||
+            msg.trim().equalsIgnoreCase("sai") ||
+            msg.trim().equalsIgnoreCase("para") ||
+            msg.trim().equalsIgnoreCase("parar") ||
+            msg.trim().equalsIgnoreCase("finaliza") ||
+            msg.trim().equalsIgnoreCase("finalizar") ||
+            msg.trim().equalsIgnoreCase("encerra") ||
+            msg.trim().equalsIgnoreCase("encerrar") ||
+            msg.trim().equalsIgnoreCase("close") ||
+            msg.trim().equalsIgnoreCase("stop") ||
+            msg.trim().equalsIgnoreCase("obrigado"))
+            return true;
+                
+        else
+            return false;
+    }
+    
     // Método que realizará o listen e comunicará com o cliente
     private void runServer() throws Exception{
         // Variável que armazenará a requisição do cliente para o servidor
-        String req = "";
+        String req;
         // Variável que armazenará a resposta do servidor para o cliente
-        String res = "";
+        String res;
         
         // Iniciando o socket do servidor
         this.socketServer = new ServerSocket(9600);
@@ -49,50 +63,60 @@ public class Server {
         // Indica que o servidor foi iniciado.
         System.out.println("Server initialized!");
         
-        // Faz um loop para que o servidor escute até que o cliente faça a conexão
+        // Faz um loop para que o servidor escute infinitamente até que um cliente faça a conexão
         while(true){
+            
             // Chama o método para verificar se o cliente fez a conexão com o servidor e a aceita se houver
-            if(connectExists()){
-                // Armazena a requisição do cliente para o servidor
-                req = Connection.receive(socketClient);
+            if(this.connectExists()){
                 
-                // Se o cliente tiver encerrado o contato
-                if(req.trim().equalsIgnoreCase("sair") ||
-                   req.trim().equalsIgnoreCase("sai") ||
-                   req.trim().equalsIgnoreCase("para") ||
-                   req.trim().equalsIgnoreCase("parar") ||
-                   req.trim().equalsIgnoreCase("finaliza") ||
-                   req.trim().equalsIgnoreCase("finalizar") ||
-                   req.trim().equalsIgnoreCase("encerra") ||
-                   req.trim().equalsIgnoreCase("encerrar") ||
-                   req.trim().equalsIgnoreCase("close") ||
-                   req.trim().equalsIgnoreCase("stop") ||
-                   req.trim().equalsIgnoreCase("obrigado")){
-                    
-                    res = "A Anhembi Morumbi agradece o seu contato. Espero ter alcançado o objetivo do seu contato! :)";
-                    Connection.send(socketClient, res);
-                    socketClient.close();
-                }
-                else if(req.trim().equalsIgnoreCase("Initializing connection with server. First contact.")){
-                    res = "Olá, eu sou o bot da Anhembi Morumbi!\nEspero poder cumprir o objetivo do seu contato!"
-                          + "\nDigite qual a sua dúvida e eu vou te responder."
-                            + "\n\nVocê pode também selecionar um dos assuntos abaixo:\n"
-                              + "\n1- Matrícula / rematrícula"
-                                + "\n2- Notas"
-                                  + "\n3- Faltas"
-                                    + "\n4- Horário"
-                                      + "\n5- Disciplinas";
-                    
-                    Connection.send(socketClient, res);
-                }
-                /*
-                * TODO
-                * else{
-                * // Aqui vai o código para pegar palavras-chave do chatbot
-                *}
-                */
+                // Interage com o cliente até que ele feche a conexão
+                while(!this.socketClient.isClosed()){
+
+                        // Armazena a requisição do cliente para o servidor
+                        req = Connection.receive(this.socketClient);
+                        
+                        // Se for a primeira conexão do cliente com o servidor, manda as opções
+                        if(req.trim().equalsIgnoreCase("Initializing connection with server. First contact.")){
+                            // Mensagem com as opções do menu
+                            res = "Olá, eu sou o bot da Anhembi Morumbi! Espero poder cumprir o objetivo do seu contato!"
+                                  + "\nDigite qual a sua dúvida e eu vou te responder."
+                                    + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                      + "\n1- Matrícula / rematrícula"
+                                        + "\n2- Notas"
+                                          + "\n3- Faltas"
+                                            + "\n4- Horário"
+                                              + "\n5- Disciplinas";
+                            
+                            // Manda a resposta para o cliente
+                            Connection.send(this.socketClient, res);
+                        }
+                        // Se o cliente mandar alguma das palavras de gatilho para sair, o socket é encerrado
+                        else if(this.checkExit(req)){
+                            // Cria uma frase de despedida
+                            res = "A Universidade Anhembi Morumbi agradece o seu contato. Espero ter alcançado o objetivo do seu contato! :)";
+                            // Manda a resposta para o cliente
+                            Connection.send(this.socketClient, res);
+                            // Fecha a conexão com o cliente
+                            this.socketClient.close();
+                        }
+                        // Se não for nem o primeiro contato nem há um gatilho para sair, executa as opções
+                        else{
+                            res = "TODO";
+                            Connection.send(this.socketClient, res);
+                        }
+
+                        /*
+                        * TODO
+                        * else{
+                        * // Aqui vai o código para pegar palavras-chave do chatbot
+                        *}
+                        */
+                    }
+                
             }
+            
         }
+        
     }
     
     public static void main(String[] args){
