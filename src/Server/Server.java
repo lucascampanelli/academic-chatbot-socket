@@ -8,6 +8,7 @@ package Server;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
+import Server.DAO.Factory.Connect;
 
 public class Server {
     
@@ -15,6 +16,10 @@ public class Server {
     private Socket socketClient;
     // Socket do servidor
     private ServerSocket socketServer;
+    
+    // Serviço para realização de matrícula
+    MatriculaService matricula;
+   
     
     // Verifica se o client realizou o connect com o server e faz o accept
     private boolean connectExists(){
@@ -56,12 +61,19 @@ public class Server {
         String req;
         // Variável que armazenará a resposta do servidor para o cliente
         String res;
+        // Variável que armazenará a opção enviada pelo cliente
+        String endpoint = "";
         
         // Iniciando o socket do servidor
         this.socketServer = new ServerSocket(9600);
         
         // Indica que o servidor foi iniciado.
         System.out.println("Server initialized!");
+        
+        // Conectar com o banco de dados
+        Connect.connect();
+        
+        matricula = new MatriculaService();
         
         // Faz um loop para que o servidor escute infinitamente até que um cliente faça a conexão
         while(true){
@@ -71,7 +83,6 @@ public class Server {
                 
                 // Interage com o cliente até que ele feche a conexão
                 while(!this.socketClient.isClosed()){
-
                         // Armazena a requisição do cliente para o servidor
                         req = Connection.receive(this.socketClient);
                         
@@ -81,11 +92,14 @@ public class Server {
                             res = "Olá, eu sou o bot da Anhembi Morumbi! Espero poder cumprir o objetivo do seu contato!"
                                   + "\nDigite qual a sua dúvida e eu vou te responder."
                                     + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
-                                      + "\n1- Matrícula / rematrícula"
-                                        + "\n2- Notas"
-                                          + "\n3- Faltas"
-                                            + "\n4- Horário"
-                                              + "\n5- Disciplinas";
+                                      + "\n1- Matrícula"
+                                        + "\n2- Rematrícula"
+                                          + "\n3- Notas"
+                                            + "\n4- Faltas"
+                                              + "\n5- Horário"
+                                                + "\n6- Disciplinas"
+                                                  + "\n7- Solicitações"
+                                                    + "\n8 - Meus boletos";
                             
                             // Manda a resposta para o cliente
                             Connection.send(this.socketClient, res);
@@ -100,17 +114,17 @@ public class Server {
                             this.socketClient.close();
                         }
                         // Se não for nem o primeiro contato nem há um gatilho para sair, executa as opções
-                        else{
-                            res = "TODO";
+                        else if(req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula") || endpoint.contains("matricula")){
+                            if(endpoint.equals(""))
+                                endpoint = "matricula/inicio";
+                            
+                            String[] matriculaResult = matricula.execute(endpoint, req);
+                            
+                            res = matriculaResult[0];
+                            endpoint = matriculaResult[1];
+                            
                             Connection.send(this.socketClient, res);
                         }
-
-                        /*
-                        * TODO
-                        * else{
-                        * // Aqui vai o código para pegar palavras-chave do chatbot
-                        *}
-                        */
                     }
                 
             }

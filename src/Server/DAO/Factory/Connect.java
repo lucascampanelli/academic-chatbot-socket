@@ -13,7 +13,7 @@ import java.sql.Statement;
 public class Connect {
     
     // Url do banco de dados que será conectado
-    private static final String url = "jdbc:sqlite:university.db";
+    private static final String url = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\Server\\DAO\\Factory\\university.db";
     // Variável que armazenará a conexão com o banco
     private static Connection conn = null;
     
@@ -21,7 +21,7 @@ public class Connect {
     public static void connect(){
         try{
             Connect.conn = DriverManager.getConnection(url);
-            System.out.println("Banco de dados conectado com sucesso!");
+            System.out.println("Database successfully connected!");
         } catch(SQLException e){
             System.out.println("Ocorreu um erro ao conectar com o banco de dados.\nDetalhes do erro: " + e.getMessage());
         }
@@ -32,7 +32,7 @@ public class Connect {
         try{
             if (Connect.conn != null) {
                 Connect.conn.close();
-                System.out.println("Banco de dados desconectado.");
+                System.out.println("Database desconnected.");
             }
             else{
                 System.out.println("Sem conexão com banco de dados criada.");
