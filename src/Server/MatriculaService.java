@@ -1,6 +1,7 @@
 package Server;
 
 import Server.Controller.CursoController;
+import Server.Controller.CampusController;
 
 /**
  *
@@ -11,9 +12,13 @@ public class MatriculaService {
     private String endpoint;
     // Controller dos cursos
     private CursoController cursoController;
+    // Controller dos campi
+    private CampusController campusController;
     
     public String[] execute(String endpoint, String req){
         this.cursoController = new CursoController();
+        this.campusController = new CampusController();
+        
         String[] resObj = new String[2];
         String resMsg = "";
         String resEndpoint = "";
@@ -63,7 +68,7 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
-                    resMsg = "Qual o seu nome?";
+                    resMsg = "Qual o seu primeiro nome?";
                 
                     resEndpoint = "matricula/sobrenome";
                 }
@@ -387,8 +392,9 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
-                    resMsg = "Qual o campus você deseja se matricular?";
-                
+                    resMsg = "Qual o campus no qual você deseja se matricular?\n";
+                    resMsg += this.campusController.listarCampi();
+                    
                     resEndpoint = "matricula/finalizar";
                 }
                     
