@@ -46,6 +46,54 @@ public class HistoricoModel {
         
     }
     
+    public HistoricoModel(int semestre,
+                          String tipoOcorrencia, int nota1,
+                          int nota2, int nota3,
+                          int notaFinal, int faltas,
+                          int cargaHoraria, int credito,
+                          String situacao, String diaSemana,
+                          int ucID, int alunoID){
+        
+        this.ID = ID;
+        this.semestre = semestre;
+        this.tipoOcorrencia = tipoOcorrencia;
+        this.nota1 = nota1;
+        this.nota2 = nota2;
+        this.nota3 = nota3;
+        this.notaFinal = notaFinal;
+        this.faltas = faltas;
+        this.cargaHoraria = cargaHoraria;
+        this.credito = credito;
+        this.situacao = situacao;
+        this.diaSemana = diaSemana;
+        this.ucID = ucID;
+        this.alunoID = alunoID;
+        
+    }
+    
+    public HistoricoModel(int semestre,
+                          String tipoOcorrencia, int faltas, 
+                          int cargaHoraria, int credito,
+                          String situacao, String diaSemana,
+                          int ucID, int alunoID){
+        
+        this.ID = ID;
+        this.semestre = semestre;
+        this.tipoOcorrencia = tipoOcorrencia;
+        this.nota1 = nota1;
+        this.nota2 = nota2;
+        this.nota3 = nota3;
+        this.notaFinal = notaFinal;
+        this.faltas = faltas;
+        this.cargaHoraria = cargaHoraria;
+        this.credito = credito;
+        this.situacao = situacao;
+        this.diaSemana = diaSemana;
+        this.ucID = ucID;
+        this.alunoID = alunoID;
+        
+    }
+    
     public int getID() {
         return ID;
     }

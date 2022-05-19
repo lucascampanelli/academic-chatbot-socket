@@ -20,6 +20,9 @@ public class DaoCurso {
         try{
             ResultSet resultado = Connect.getPreparedStatement(sql).executeQuery();
             
+            if(!resultado.isBeforeFirst())
+                return null;
+            
             while(resultado.next()){
                 CursoModel cursoModelo = new CursoModel(resultado.getInt("ID"), 
                                                         resultado.getString("nome"),

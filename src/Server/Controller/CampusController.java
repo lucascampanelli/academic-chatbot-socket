@@ -15,12 +15,15 @@ public class CampusController {
     public String listarCampi(){
         ArrayList<CampusModel> campi = this.DAO.listarCampi();
         String res = "";
+        // Variável que contará os itens da lista de cursos exibida para o usuário
+        int count = 0;
         
         for(int i = 0; i < campi.size(); i++){
+            count = i+1;
             if(i == (campi.size() - 1))
-                res += (i + 1) + "- " + campi.get(i).getNome() + " | " + campi.get(i).getEndereco() + ", " + campi.get(i).getBairro() + ", " + campi.get(i).getCidade()+ ", " + campi.get(i).getEstado() + ";";
+                res += count + "- " + campi.get(i).getNome() + " | " + campi.get(i).getEndereco() + ", " + campi.get(i).getBairro() + ", " + campi.get(i).getCidade()+ ", " + campi.get(i).getEstado() + ";";
             else
-                res += (i + 1) + "- " + campi.get(i).getNome() + " | " + campi.get(i).getEndereco() + ", " + campi.get(i).getBairro() + ", " + campi.get(i).getCidade()+ ", " + campi.get(i).getEstado() + "; \n";
+                res += count + "- " + campi.get(i).getNome() + " | " + campi.get(i).getEndereco() + ", " + campi.get(i).getBairro() + ", " + campi.get(i).getCidade()+ ", " + campi.get(i).getEstado() + "; \n";
         }
         
         if(res.equals(""))

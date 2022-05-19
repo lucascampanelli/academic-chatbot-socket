@@ -1,7 +1,9 @@
 package Server;
 
-import Server.Controller.CursoController;
+import Server.Controller.AlunoController;
 import Server.Controller.CampusController;
+import Server.Controller.CursoController;
+import Server.Controller.Response;
 
 /**
  *
@@ -10,37 +12,44 @@ import Server.Controller.CampusController;
 public class MatriculaService {
     // Variável para controle da etapa que o usuário está
     private String endpoint;
-    // Controller dos cursos
-    private CursoController cursoController;
+    // Controller dos alunos
+    private AlunoController alunoController;
     // Controller dos campi
     private CampusController campusController;
+    // Controller dos cursos
+    private CursoController cursoController;
+    // Objeto de resposta da controller
+    private Response resposta;
+    
+    // Dados para matrícula do usuário
+    private int curso = 0;
+    private String nome = "";
+    private String sobrenome = "";
+    private String rg = "";
+    private String cpf = "";
+    private String sexo = "";
+    private String dataNascimento = "";
+    private String celular = "";
+    private String telefone = "";
+    private String email = "";
+    private String endereco = "";
+    private String complemento = "";
+    private String bairro = "";
+    private String cidade = "";
+    private String estado = "";
+    private String cep = "";
+    private String historico = "";
+    private boolean bolsa = false;
+    private int campus = 0;
     
     public String[] execute(String endpoint, String req){
         this.cursoController = new CursoController();
         this.campusController = new CampusController();
+        this.alunoController = new AlunoController();
         
         String[] resObj = new String[2];
         String resMsg = "";
         String resEndpoint = "";
-        
-        int curso;
-        String nome;
-        String sobrenome;
-        String rg;
-        String cpf;
-        String sexo;
-        String dataNascimento;
-        String celular;
-        String telefone;
-        String email;
-        String endereco;
-        String complemento;
-        String bairro;
-        String cidade;
-        String estado;
-        String cep;
-        boolean bolsa;
-        int campus;
         
         switch(endpoint){
             case "matricula/inicio":
@@ -55,9 +64,9 @@ public class MatriculaService {
                 return resObj;
             
             case "matricula/nome":
-                curso = Integer.parseInt(req.trim());
+                this.curso = Integer.parseInt(req.trim());
                 
-                if(curso == 0){
+                if(!(this.curso > 0)){
                     resMsg = "Informe um curso válido.";
                 
                     resEndpoint = "matricula/nome";
@@ -78,9 +87,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/sobrenome":
-                nome = req;
+                this.nome = req;
                 
-                if(nome.length() == 0){
+                if(this.nome.length() == 0){
                     resMsg = "Informe um nome válido.";
                 
                     resEndpoint = "matricula/sobrenome";
@@ -101,9 +110,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/rg":
-                sobrenome = req;
+                this.sobrenome = req;
                 
-                if(sobrenome.length() == 0){
+                if(this.sobrenome.length() == 0){
                     resMsg = "Informe um sobrenome válido.";
                 
                     resEndpoint = "matricula/rg";
@@ -124,9 +133,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/cpf":
-                rg = req;
+                this.rg = req;
                 
-                if(rg.length() == 0){
+                if(this.rg.length() == 0){
                     resMsg = "Informe um rg válido.";
                 
                     resEndpoint = "matricula/cpf";
@@ -147,9 +156,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/sexo":
-                cpf = req;
+                this.cpf = req;
                 
-                if(cpf.length() == 0){
+                if(this.cpf.length() == 0){
                     resMsg = "Informe um sobrenome válido.";
                 
                     resEndpoint = "matricula/sexo";
@@ -170,9 +179,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/nascimento":
-                sexo = req;
+                this.sexo = req;
                 
-                if(!(sexo.trim().equalsIgnoreCase("masculino") || sexo.trim().equalsIgnoreCase("feminino"))){
+                if(!(this.sexo.trim().equalsIgnoreCase("masculino") || this.sexo.trim().equalsIgnoreCase("feminino"))){
                     resMsg = "Informe um sexo válido.";
                 
                     resEndpoint = "matricula/nascimento";
@@ -193,9 +202,9 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/celular":
-                dataNascimento = req;
+                this.dataNascimento = req;
                 
-                if(dataNascimento.length() < 10){
+                if(this.dataNascimento.length() < 10){
                     resMsg = "Informe uma data válida.";
                 
                     resEndpoint = "matricula/nascimento";
@@ -216,8 +225,8 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/telefone":                
-                if(!req.equals("pular")){
-                    celular = req;
+                if(!(req.trim().equalsIgnoreCase("pular"))){
+                    this.celular = req;
                 }
                 
                 resMsg = "Qual o seu número de telefone residencial? (Se não houver, digite pular)";
@@ -229,8 +238,8 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/email":
-                if(!req.equals("pular")){
-                    telefone = req;
+                if(!(req.trim().equalsIgnoreCase("pular"))){
+                    this.telefone = req;
                 }
                 
                 resMsg = "Qual o seu e-mail?";
@@ -253,6 +262,8 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    this.email = req;
+                    
                     resMsg = "Qual o seu endereço?";
                 
                     resEndpoint = "matricula/complemento";
@@ -274,6 +285,8 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    this.endereco = req;
+                    
                     resMsg = "O endereço possui complemento? (Se não houver, digite pular)";
                 
                     resEndpoint = "matricula/bairro";
@@ -284,8 +297,8 @@ public class MatriculaService {
                 return resObj;
                 
             case "matricula/bairro":
-                if(!req.equals("pular")){
-                    complemento = req;
+                if(!req.trim().equalsIgnoreCase("pular")){
+                    this.complemento = req;
                 }
                 
                 resMsg = "Qual o bairro do endereço?";
@@ -308,6 +321,8 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    this.bairro = req;
+                    
                     resMsg = "Qual a cidade do endereço?";
                 
                     resEndpoint = "matricula/estado";
@@ -329,6 +344,8 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    this.cidade = req;
+                    
                     resMsg = "Qual o estado do endereço? (Informe o nome completo, por exemplo: São Paulo)";
                 
                     resEndpoint = "matricula/cep";
@@ -350,16 +367,18 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    this.estado = req;
+                    
                     resMsg = "Qual o CEP do endereço?";
                 
-                    resEndpoint = "matricula/bolsa";
+                    resEndpoint = "matricula/historico";
                 }
                     
                 resObj[0] = resMsg;
                 resObj[1] = resEndpoint;
                 return resObj;
                 
-            case "matricula/bolsa":
+            case "matricula/historico":
                 if(req.length() == 0){
                     resMsg = "Informe um CEP válido.";
                 
@@ -371,10 +390,25 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
-                    resMsg = "Possui bolsa parcial ou bolsa integral? (Sim ou não)";
+                    this.cep = req;
+                    
+                    resMsg = "Envie o histórico escolar do ensino médio. (Se não houver ainda, digite pular)";
                 
-                    resEndpoint = "matricula/campus";
+                    resEndpoint = "matricula/bolsa";
                 }
+                    
+                resObj[0] = resMsg;
+                resObj[1] = resEndpoint;
+                return resObj;
+                
+            case "matricula/bolsa":
+                if(!req.trim().equalsIgnoreCase("pular")){
+                    this.historico = req;
+                }
+                
+                resMsg = "Possui bolsa parcial ou bolsa integral? (Sim ou não)";
+
+                resEndpoint = "matricula/campus";
                     
                 resObj[0] = resMsg;
                 resObj[1] = resEndpoint;
@@ -392,6 +426,11 @@ public class MatriculaService {
                     return resObj;
                 }
                 else{
+                    if(req.trim().equalsIgnoreCase("sim"))
+                        this.bolsa = true;
+                    else
+                        this.bolsa = false;
+                    
                     resMsg = "Qual o campus no qual você deseja se matricular?\n";
                     resMsg += this.campusController.listarCampi();
                     
@@ -403,7 +442,31 @@ public class MatriculaService {
                 return resObj;
             
             case "matricula/finalizar":
-                System.out.println("foi");
+                this.campus = Integer.parseInt(req.trim());
+                
+                if(!(this.campus > 0)){
+                    resMsg = "Informe um campus válido.";
+                
+                    resEndpoint = "matricula/finalizar";
+                    
+                    resObj[0] = resMsg;
+                    resObj[1] = resEndpoint;
+                    
+                    return resObj;
+                }
+                else{
+                    resposta = this.alunoController.realizarMatricula(this.curso, this.nome, this.sobrenome, this.rg, this.cpf, this.sexo, this.dataNascimento, this.celular, this.telefone, this.email, this.endereco, this.complemento, this.bairro, this.cidade, this.estado, this.cep, this.historico, this.bolsa, this.campus);
+                    
+                    // Armazenando a mensagem de resposta para o cliente.
+                    // Se a matrícula for bem-sucedida, retorna a mensagem, senão, retorna a mensagem de erro
+                    resMsg = resposta.getSuccess() ? resposta.getMessage() : resposta.getError();
+                
+                    resEndpoint = "";
+                }
+                    
+                resObj[0] = resMsg;
+                resObj[1] = resEndpoint;
+                return resObj;
         }
         
         return resObj;
