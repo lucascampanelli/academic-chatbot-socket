@@ -163,10 +163,10 @@ public class AlunoController {
             
             if(!(this.DAOBoleto.inserirBoleto(boleto) > 0)){
                 System.out.println("Ocorreu um erro ao gerar o boleto de matrícula do aluno.");
-                resposta.setMessage(nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
             }
             else{
-                resposta.setMessage(nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
             }
         }
         else{
@@ -203,10 +203,10 @@ public class AlunoController {
             
             if(!(this.DAOBoleto.inserirBoleto(boleto) > 0)){
                 System.out.println("Ocorreu um erro ao gerar o boleto de matrícula do aluno.");
-                resposta.setMessage(nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
             }
             else{
-                resposta.setMessage(nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
             }
         }
         

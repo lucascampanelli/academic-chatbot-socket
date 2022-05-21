@@ -68,6 +68,11 @@ public class Client {
             // Exibindo a mensagem de response do servidor no console
             System.out.println(res);
             
+            // Verifica se a mensagem de resposta do servidor é um encerramento de serviço
+            if(this.checkServerClose(res))
+                // Se for um pedido para sair do programa, fecha o socket
+                this.socket.close();
+            
             // Se for a primeira interação do cliente com o servidor
             if(firstRun)
                 // Define a variável de controle de interação como false
@@ -97,6 +102,13 @@ public class Client {
                 
         else
             return false;
+    }
+    
+    // Método responsável por verificar se a mensagem do servidor foi um encerramento de serviço
+    private boolean checkServerClose(String msg){
+        return msg
+               .trim()
+               .equalsIgnoreCase("A Universidade Anhembi Morumbi agradece o seu contato. Espero ter alcançado o objetivo do seu contato! :)");
     }
     
     

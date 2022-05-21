@@ -471,4 +471,29 @@ public class MatriculaService {
         
         return resObj;
     }
+    
+    // Método para testar a realização da matrícula com um registro teste, sem ter que inserir os dados
+    public String[] executeTest(){
+        this.alunoController = new AlunoController();
+        
+        String[] resObj = new String[2];
+        String resMsg;
+        
+        resposta = this.alunoController.realizarMatricula(1, "Carolina", "de Souza", "264506951", 
+                                                          "26305496045", "Masculino", "22/07/2002", 
+                                                          "(11) 96755-1027", "", "caroldesouza@email.com", 
+                                                          "Rua das Palmeiras, 67", "Apartamento 200", 
+                                                          "Tatuapé", "São Paulo", "São Paulo", "03350060", 
+                                                          "", true, 1);
+                    
+        // Armazenando a mensagem de resposta para o cliente.
+        // Se a matrícula for bem-sucedida, retorna a mensagem, senão, retorna a mensagem de erro
+        resMsg = resposta.getSuccess() ? resposta.getMessage() : resposta.getError();
+
+        resObj[0] = resMsg;
+        resObj[1] = "";
+        
+        return resObj;
+    }
+    
 }
