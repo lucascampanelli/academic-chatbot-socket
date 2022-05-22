@@ -19,6 +19,9 @@ public class Server {
     
     // Serviço para realização de matrícula
     MatriculaService matricula;
+    
+    // Serviço para autenticação do usuário
+    AuthService auth;
    
     
     // Verifica se o client realizou o connect com o server e faz o accept
@@ -63,6 +66,12 @@ public class Server {
         String res;
         // Variável que armazenará a opção enviada pelo cliente
         String endpoint = "";
+        // Variável que armazenará se o usuário é aluno ou não.
+        boolean isAluno = false;
+        // Variável que armazenará o ra do usuário
+        int ra = -1;
+        // Variável que armazenará a data de nascimento do aluno
+        String dataNascimento;
         
         // Iniciando o socket do servidor
         this.socketServer = new ServerSocket(9600);
@@ -87,19 +96,166 @@ public class Server {
                         req = Connection.receive(this.socketClient);
                         
                         // Se for a primeira conexão do cliente com o servidor, manda as opções
-                        if(req.trim().equalsIgnoreCase("Initializing connection with server. First contact.") || req.trim().equalsIgnoreCase("menu")){
-                            // Mensagem com as opções do menu
-                            res = "Olá, eu sou o bot da Anhembi Morumbi! Espero poder cumprir o objetivo do seu contato!"
-                                  + "\nDigite qual a sua dúvida e eu vou te responder."
-                                    + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
-                                      + "\n1- Matrícula"
-                                        + "\n2- Rematrícula"
-                                          + "\n3- Notas"
-                                            + "\n4- Faltas"
-                                              + "\n5- Horário"
-                                                + "\n6- Disciplinas"
-                                                  + "\n7- Solicitações"
-                                                    + "\n8 - Meus boletos";
+                        if(req.trim().equalsIgnoreCase("Initializing connection with server. First contact.")){
+                            
+                            // Armazenando um endpoint para o servidor gerenciar as requisições acerca do primeir ocontato
+                            endpoint = "firstcontact";
+                            
+                            // Mensagem perguntando se o usuário é aluno ou não da IES
+                            res = "Olá, eu sou o bot da Anhembi Morumbi! Espero poder cumprir o objetivo do seu contato!" +
+                                    "\nAntes de continuarmos, responda: Você já é aluno da Universidade Anhembi Morumbi?"
+                                    + "\n(Sim ou Não)";
+                            
+                            // Manda a resposta para o cliente
+                            Connection.send(this.socketClient, res);
+                            
+                        }
+                        else if(endpoint.contains("firstcontact")){
+                            switch(endpoint){
+                                case "firstcontact":
+                                    
+                                    if("sim".equalsIgnoreCase(req.trim()) || "si".equalsIgnoreCase(req.trim()) || "s".equalsIgnoreCase(req.trim())){
+                                        res = "Qual o seu RA?";
+                                        
+                                        isAluno = true;
+                                        
+                                        endpoint = "firstcontact/ra";
+                                        
+                                        // Manda a resposta para o cliente
+                                        Connection.send(this.socketClient, res);
+                                        
+                                        break;
+                                    }
+                                    
+                                    else if("não".equalsIgnoreCase(req.trim()) || "nao".equalsIgnoreCase(req.trim()) || "n".equalsIgnoreCase(req.trim())){
+                                        isAluno = false;
+                                        
+                                        endpoint = "";
+                                        
+                                        res = "\n\nDigite qual a sua dúvida e eu vou te responder."
+                                                + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                                  + "\n1- Matrícula"
+                                                    + "\n2- Campi"
+                                                      + "\n3- Cursos";
+
+                                        // Manda a resposta para o cliente
+                                        Connection.send(this.socketClient, res);
+                                        break;
+                                    }
+                                    
+                                    else{
+                                        res = "Desculpe-me, não entendi o que você quis dizer."
+                                                + "\nVocê já é aluno da Universidade Anhembi Morumbi?"
+                                                + "\n(Responda Sim ou Não)";
+                                        
+                                        // Manda a resposta para o cliente
+                                        Connection.send(this.socketClient, res);
+                                        
+                                        break;
+                                    }
+                                
+                                case "firstcontact/ra":
+                                    if(Integer.parseInt(req.trim()) < 1){
+                                        res = "Desculpe-me, não entendi o que você quis dizer."
+                                                + "\nQual o seu RA?";
+                                        
+                                        // Manda a resposta para o cliente
+                                        Connection.send(this.socketClient, res);
+                                        
+                                        break;
+                                    }
+                                    else{
+                                        this.auth = new AuthService();
+                                        
+                                        if(this.auth.raExists(Integer.parseInt(req.trim()))){
+                                            ra = Integer.parseInt(req.trim());
+                                        
+                                            res = "Qual a sua data de nascimento? Informe no padrão dd/mm/aaaa.";
+
+                                            endpoint = "firstcontact/datanascimento";
+
+                                            // Manda a resposta para o cliente
+                                            Connection.send(this.socketClient, res);
+
+                                            break;
+                                        }
+                                        else{
+                                            res = "Não encontramos esse RA no sistema. Tem certeza que é esse número?"
+                                                    + "\nInforme o seu RA novamente.";
+                                            
+                                            // Manda a resposta para o cliente
+                                            Connection.send(this.socketClient, res);
+
+                                            break;
+                                        }
+                                    }
+                                    
+                                case "firstcontact/datanascimento":
+                                    if(!(req.trim().length() == 10)){
+                                        res = "Desculpe-me, não entendi o que você quis dizer."
+                                                + "\nQual a sua data de nascimento? Informe no padrão dd/mm/aaaa.";
+                                        
+                                        // Manda a resposta para o cliente
+                                        Connection.send(this.socketClient, res);
+                                        
+                                        break;
+                                    }
+                                    else{
+                                        this.auth = new AuthService();
+                                        
+                                        dataNascimento = req;
+                                                                                
+                                        if(this.auth.raBirthMatches(ra, dataNascimento)){
+                                            endpoint = "";
+                                        
+                                            // Mensagem com as opções do menu
+                                            res = "\n\nOlá, " + this.auth.getStudentName(ra) + "!\nDigite qual a sua dúvida e eu vou te responder."
+                                                    + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                                        + "\n1- Rematrícula"
+                                                          + "\n2- Notas"
+                                                            + "\n3- Faltas"
+                                                              + "\n4- Horário"
+                                                                + "\n5- Disciplinas"
+                                                                  + "\n6- Solicitações"
+                                                                    + "\n7 - Meus boletos";
+
+                                            // Manda a resposta para o cliente
+                                            Connection.send(this.socketClient, res);
+                                            break;
+                                        }
+                                        else{
+                                            res = "A data de nascimento informada não confere com o RA informado anteriormente. Tem certeza que digitou corretamente?"
+                                                        + "\nInforme a data de nascimento novamente, no padrão dd/mm/aaaa.";
+                                            
+                                            // Manda a resposta para o cliente
+                                            Connection.send(this.socketClient, res);
+
+                                            break;
+                                        }
+                                    }
+                            }
+                        }
+                        else if(req.trim().equalsIgnoreCase("menu") || req.trim().equalsIgnoreCase("cancelar")){
+                            if(isAluno){
+                                // Mensagem com as opções do menu
+                                res = "\nDigite qual a sua dúvida e eu vou te responder."
+                                        + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                            + "\n1- Rematrícula"
+                                              + "\n2- Notas"
+                                                + "\n3- Faltas"
+                                                  + "\n4- Horário"
+                                                    + "\n5- Disciplinas"
+                                                      + "\n6- Solicitações"
+                                                        + "\n7 - Meus boletos";   
+                                }
+                            else{
+                                // Mensagem com as opções do menu
+                                res = "\n\nDigite qual a sua dúvida e eu vou te responder."
+                                                + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                                  + "\n1- Matrícula"
+                                                    + "\n2- Campi"
+                                                      + "\n3- Cursos";
+                            }
                             
                             // Manda a resposta para o cliente
                             Connection.send(this.socketClient, res);
@@ -114,15 +270,15 @@ public class Server {
                             this.socketClient.close();
                         }
                         // Se não for nem o primeiro contato nem há um gatilho para sair, executa as opções
-                        else if((endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula"))) || endpoint.contains("matricula") ){
+                        else if((!isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula"))) || endpoint.contains("matricula")){
                             // Se o usuário escolheu a primeira opção no menu de opções e não está no endpoint da matrícula
                             if(endpoint.equals(""))
                                 endpoint = "matricula/inicio";
                             
                             // Pega o vetor da resposta do serviço de matrícula.
                             // No índice 0 é retornado a resposta do serviço e no índice 1 é retornado o endpoint para direcionar o chamado.
-                            //String[] matriculaResult = matricula.execute(endpoint, req);
                             String[] matriculaResult = matricula.execute(endpoint, req);
+                            //String[] matriculaResult = matricula.executeTest();
                             
                             // Armazenando a resposta do serviço de matrícula
                             res = matriculaResult[0];
@@ -131,6 +287,8 @@ public class Server {
                             
                             // Se o serviço da matrícula terminou
                             if("".equals(endpoint)){
+                                if(res.contains("sua matrícula foi realizada com sucesso"))
+                                    isAluno = true;
                                 // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
                                 res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
                                 // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
@@ -140,22 +298,33 @@ public class Server {
                             // Manda a resposta para o usuário
                             Connection.send(this.socketClient, res);
                         }
+                        // Se for aluno e enviar a opção de rematrícula
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("rematrícula"))) || endpoint.contains("rematricula")){
+                            
+                        }
                         // Se o endpoint atual for a escolha da opção depois do fim de uma atividade
                         else if("fimAtividade".equals(endpoint)){
                             // Se o usuário escolheu a primeira opção, listar o menu novamente
                             if(("1".equalsIgnoreCase(req.trim()) || "menu".equalsIgnoreCase(req.trim()))){
-                                // Mensagem com as opções do menu
-                                res = "\nDigite qual a sua dúvida e eu vou te responder."
-                                        + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
-                                          + "\n1- Matrícula"
-                                            + "\n2- Rematrícula"
-                                              + "\n3- Notas"
-                                                + "\n4- Faltas"
-                                                  + "\n5- Horário"
-                                                    + "\n6- Disciplinas"
-                                                      + "\n7- Solicitações"
-                                                        + "\n8 - Meus boletos";
-                                
+                                //Verificar se é aluno
+                                if(isAluno)
+                                    // Mensagem com as opções do menu
+                                    res = "\nDigite qual a sua dúvida e eu vou te responder."
+                                            + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                                + "\n1- Rematrícula"
+                                                  + "\n2- Notas"
+                                                    + "\n3- Faltas"
+                                                      + "\n4- Horário"
+                                                        + "\n5- Disciplinas"
+                                                          + "\n6- Solicitações"
+                                                            + "\n7 - Meus boletos";
+                                else
+                                    // Mensagem com as opções do menu
+                                    res = "\n\nDigite qual a sua dúvida e eu vou te responder."
+                                                + "\n\nVocê pode também selecionar um dos assuntos abaixo:"
+                                                  + "\n1- Matrícula"
+                                                    + "\n2- Campi"
+                                                      + "\n3- Cursos";
                                 endpoint = "";
                                 
                                 // Manda a resposta para o cliente

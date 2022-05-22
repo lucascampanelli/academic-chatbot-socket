@@ -163,10 +163,10 @@ public class AlunoController {
             
             if(!(this.DAOBoleto.inserirBoleto(boleto) > 0)){
                 System.out.println("Ocorreu um erro ao gerar o boleto de matrícula do aluno.");
-                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso! Seu RA é " + ra + ".\nSeu horário das disciplinas já está disponível para consulta.");
             }
             else{
-                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso! Seu RA é " + ra + ".\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
             }
         }
         else{
@@ -203,16 +203,102 @@ public class AlunoController {
             
             if(!(this.DAOBoleto.inserirBoleto(boleto) > 0)){
                 System.out.println("Ocorreu um erro ao gerar o boleto de matrícula do aluno.");
-                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nSeu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso! Seu RA é " + ra + ".\nSeu horário das disciplinas já está disponível para consulta.");
             }
             else{
-                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso!\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
+                resposta.setMessage("\n" + nome + ", sua matrícula foi realizada com sucesso! Seu RA é " + ra + ".\nO seu boleto de matrícula já está disponível para pagamento e pode ser consultado por este canal.\nAlém disso, seu horário das disciplinas já está disponível para consulta.");
             }
         }
         
         resposta.setSuccess(true);
         
         return resposta;
+    }
+    
+    public String obterDadoAluno(int ra, String dado){
+        this.DAOAluno = new DaoAluno();
+        
+        AlunoModel aluno = this.DAOAluno.buscarAluno(ra);
+        
+        if(aluno == null)
+            return "erro";
+        
+        if(aluno.getID() < 1)
+            return "erro";
+        
+        if(dado.equalsIgnoreCase("id"))
+            return "" + aluno.getID();
+        
+        if(dado.equalsIgnoreCase("nome"))
+            return aluno.getNome();
+        
+        if(dado.equalsIgnoreCase("sobrenome"))
+            return aluno.getSobrenome();
+        
+        if(dado.equalsIgnoreCase("rg"))
+            return aluno.getRg();
+        
+        if(dado.equalsIgnoreCase("cpf"))
+            return aluno.getCpf();
+        
+        if(dado.equalsIgnoreCase("sexo"))
+            return aluno.getSexo();
+        
+        if(dado.equalsIgnoreCase("dataNascimento"))
+            return aluno.getDataNascimento();
+        
+        if(dado.equalsIgnoreCase("celular"))
+            return aluno.getCelular();
+        
+        if(dado.equalsIgnoreCase("telefone"))
+            return aluno.getTelefone();
+        
+        if(dado.equalsIgnoreCase("email"))
+            return aluno.getEmail();
+        
+        if(dado.equalsIgnoreCase("emailInsti"))
+            return aluno.getEmailInsti();
+        
+        if(dado.equalsIgnoreCase("endereco"))
+            return aluno.getEndereco();
+        
+        if(dado.equalsIgnoreCase("complemento"))
+            return aluno.getComplemento();
+        
+        if(dado.equalsIgnoreCase("bairro"))
+            return aluno.getBairro();
+        
+        if(dado.equalsIgnoreCase("cidade"))
+            return aluno.getCidade();
+        
+        if(dado.equalsIgnoreCase("estado"))
+            return aluno.getEstado();
+        
+        if(dado.equalsIgnoreCase("cep"))
+            return aluno.getCep();
+        
+        if(dado.equalsIgnoreCase("semestreAtual"))
+            return "" + aluno.getSemestreAtual();
+        
+        if(dado.equalsIgnoreCase("status"))
+            return aluno.getStatus();
+        
+        if(dado.equalsIgnoreCase("historicoEscolar"))
+            return "" + aluno.isHistoricoEscolar();
+        
+        if(dado.equalsIgnoreCase("bolsaRenovada"))
+            return "" + aluno.isBolsaRenovada();
+        
+        if(dado.equalsIgnoreCase("possuiBolsa"))
+            return "" + aluno.isPossuiBolsa();
+        
+        if(dado.equalsIgnoreCase("campusID"))
+            return "" + aluno.getCampusID();
+        
+        if(dado.equalsIgnoreCase("cursoID"))
+            return "" + aluno.getCursoID();
+        else
+            return "erro";
     }
     
 }

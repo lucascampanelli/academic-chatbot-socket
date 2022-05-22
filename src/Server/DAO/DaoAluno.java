@@ -79,7 +79,11 @@ public class DaoAluno {
             
             ResultSet resultado = Connect.getPreparedStatement(sql).executeQuery();
             
-            AlunoModel aluno = new AlunoModel(resultado.getInt("ID"), resultado.getString("nome"), resultado.getString("sobrenome"),
+            
+            AlunoModel aluno = null;
+            
+            while(resultado.next()){
+                aluno = new AlunoModel(resultado.getInt("ID"), resultado.getString("nome"), resultado.getString("sobrenome"),
                                               resultado.getString("rg"), resultado.getString("cpf"), resultado.getString("sexo"),
                                               resultado.getString("dataNascimento"), resultado.getString("celular"), resultado.getString("telefone"),
                                               resultado.getString("email"), resultado.getString("emailInsti"), resultado.getString("endereco"),
@@ -87,6 +91,7 @@ public class DaoAluno {
                                               resultado.getString("estado"), resultado.getString("cep"), resultado.getInt("semestreAtual"),
                                               resultado.getString("status"), resultado.getBoolean("historicoEscolar"), resultado.getBoolean("bolsaRenovada"),
                                               resultado.getBoolean("possuiBolsa"), resultado.getInt("campusID"), resultado.getInt("cursoID"));
+            }
             
             return aluno;
         }
