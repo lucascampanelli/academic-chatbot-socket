@@ -301,4 +301,70 @@ public class AlunoController {
             return "erro";
     }
     
+    public Response realizarRematricula(int ra, String celular, String telefone, String historicoEscolar){
+        // Instanciando o DAO do Aluno
+        this.DAOAluno = new DaoAluno();
+        
+        // Instanciando o objeto de retorno
+        Response resposta = new Response();
+        
+        boolean historicoEnviado = false;
+        
+        if(historicoEscolar.trim().length() > 0)
+            historicoEnviado = true;
+        
+        int semestreAtual = this.DAOAluno.rematricularAluno(ra, celular, telefone, historicoEnviado);
+        
+        int cursoID = Integer.parseInt(this.obterDadoAluno(ra, "cursoID").trim());
+        
+        if(!(semestreAtual > 0)){
+            resposta.setSuccess(false);
+            resposta.setError("Ocorreu um problema ao realizar a rematrícula. Tente novamente mais tarde."
+                                + "\nSe o problema persistir, entre em contato com a Central de Atendimento ao Aluno.");
+        
+            return resposta;
+        }
+        
+        // Instanciando a classe DAO do currículo que possui o método para listar o currículo do semestre
+        this.DAOCurriculo  = new DaoCurriculo();
+        
+        // Criando a lista que armazenará o currículo (disciplinas que fazem parte do curso) desse semestre
+        ArrayList<CurriculoModel> curriculoSemestre;
+        
+        // Armazenando na lista o currículo do semestre do curso do aluno rematriculado
+        curriculoSemestre = this.DAOCurriculo.listarCurriculoSemestre(semestreAtual, cursoID);
+        
+        // Se o currículo acadêmico do semestre não for maior do que 0, ocorreu um erro
+        if(curriculoSemestre == null){
+            resposta.setSuccess(false);
+            resposta.setError("Ocorreu um problema ao realizar a rematrícula. Tente novamente mais tarde."
+                                + "\nSe o problema persistir, entre em contato com a Central de Atendimento ao Aluno.");
+            
+            return resposta;
+        }
+        
+        // Instanciando a clase DAO do histórico que possui o método para inserir uma disciplina no histórico
+        this.DAOHistorico = new DaoHistorico();
+        
+        // Cada disciplina que o curso tem nesse semestre será adicionada ao histórico (disciplinas cursadas) do aluno
+        for(int i = 0; i < curriculoSemestre.size(); i++){
+            HistoricoModel historicoModelo = new HistoricoModel(semestreAtual, "Obrigatória", 0, curriculoSemestre.get(i).getCargaHoraria(), 8, 
+                                                          "Cursando", curriculoSemestre.get(i).getDiaSemana(), curriculoSemestre.get(i).getUcID(), ra);
+        
+            // Se o ID do histórico criado, retornado pelo método, não for maior do que 0, ocorreu um erro
+            if(!(this.DAOHistorico.inserirHistorico(historicoModelo) > 0)){
+                resposta.setSuccess(false);
+                resposta.setError("Ocorreu um problema ao realizar a rematrícula. Tente novamente mais tarde."
+                                    + "\nSe o problema persistir, entre em contato com a Central de Atendimento ao Aluno.");
+
+                return resposta;
+            }  
+        }
+        
+        resposta.setSuccess(true);
+        resposta.setMessage("\n" + this.obterDadoAluno(ra, "nome") + ", sua rematrícula foi realizada com sucesso! Seu novo horário das disciplinas já está disponível para consulta.");
+        
+        return resposta;
+    }
+    
 }

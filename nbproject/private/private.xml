@@ -5,9 +5,8 @@
         <group>
             <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/Controller/AlunoController.java</file>
             <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/Server.java</file>
-            <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/Model/AlunoModel.java</file>
+            <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/RematriculaService.java</file>
             <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/MatriculaService.java</file>
-            <file>file:/D:/Netbeans/academic-chatbot-socket/src/Server/AuthService.java</file>
         </group>
     </open-files>
 </project-private>

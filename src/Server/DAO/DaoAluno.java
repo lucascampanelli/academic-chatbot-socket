@@ -101,4 +101,50 @@ public class DaoAluno {
         }
     }
     
+    public int rematricularAluno(int ra, String celular, String telefone, boolean historicoEscolar){
+        try{
+            String sql = "SELECT semestreAtual FROM Aluno WHERE ID = " + ra;
+            
+            ResultSet resultado = Connect.getPreparedStatement(sql).executeQuery();
+            
+            int semestreAtual = -1;
+            
+            while(resultado.next()){
+                semestreAtual = resultado.getInt("semestreAtual");
+            }
+            
+            if(semestreAtual < 1)
+                return -1;
+            
+            semestreAtual++;
+            
+            String celularUpdate = "";
+            String telefoneUpdate = "";
+            String historicoUpdate = "";
+            
+            if(celular.trim().length() > 0)
+                celularUpdate = ", celular = '" + celular + "'";
+            
+            if(telefone.trim().length() > 0)
+                telefoneUpdate = ", telefone = '" + telefone + "'";
+            
+            if(historicoEscolar)
+                historicoUpdate = ", historicoEscolar = true";
+            
+            sql = "UPDATE Aluno SET semestreAtual = " + semestreAtual + ", status = 'Rematriculado'"
+                                                                        + celularUpdate
+                                                                        + telefoneUpdate
+                                                                        + historicoUpdate
+                                                                        + " WHERE ID = " + ra;
+            
+            int rowsAffected = Connect.getPreparedStatement(sql).executeUpdate();
+            
+            return rowsAffected > 0 ? semestreAtual : -1;
+        }
+        catch(SQLException e){
+            System.out.println("Ocorreu um erro ao rematricular o aluno para o próximo semestre.\nDetalhes do erro: " + e.getMessage());
+            return -1;
+        }
+    }
+    
 }

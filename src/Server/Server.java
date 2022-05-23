@@ -20,6 +20,9 @@ public class Server {
     // Serviço para realização de matrícula
     MatriculaService matricula;
     
+    // Serviço para realização de matrícula
+    RematriculaService rematricula;
+    
     // Serviço para autenticação do usuário
     AuthService auth;
    
@@ -83,6 +86,8 @@ public class Server {
         Connect.connect();
         
         matricula = new MatriculaService();
+        
+        rematricula = new RematriculaService();
         
         // Faz um loop para que o servidor escute infinitamente até que um cliente faça a conexão
         while(true){
@@ -270,7 +275,7 @@ public class Server {
                             this.socketClient.close();
                         }
                         // Se não for nem o primeiro contato nem há um gatilho para sair, executa as opções
-                        else if((!isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula"))) || endpoint.contains("matricula")){
+                        else if((!isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula"))) || "matricula".equals(endpoint.split("/")[0])){
                             // Se o usuário escolheu a primeira opção no menu de opções e não está no endpoint da matrícula
                             if(endpoint.equals(""))
                                 endpoint = "matricula/inicio";
@@ -299,8 +304,30 @@ public class Server {
                             Connection.send(this.socketClient, res);
                         }
                         // Se for aluno e enviar a opção de rematrícula
-                        else if((isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("rematrícula"))) || endpoint.contains("rematricula")){
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("rematrícula"))) || "rematricula".equals(endpoint.split("/")[0])){
+                            // Se o usuário escolheu a primeira opção no menu de opções e não está no endpoint da rematrícula
+                            if(endpoint.equals(""))
+                                endpoint = "rematricula/inicio";
                             
+                            // Pega o vetor da resposta do serviço de matrícula.
+                            // No índice 0 é retornado a resposta do serviço e no índice 1 é retornado o endpoint para direcionar o chamado.
+                            String[] rematriculaResult = rematricula.execute(endpoint, req, ra);
+                            
+                            // Armazenando a resposta do serviço de rematrícula
+                            res = rematriculaResult[0];
+                            // Armazenando o próximo endpoint a ser executado pelo servidor
+                            endpoint = rematriculaResult[1];
+                            
+                            // Se o serviço da rematrícula terminou
+                            if("".equals(endpoint)){
+                                // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                                res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                                // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
+                                endpoint = "fimAtividade";
+                            }
+                            
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
                         }
                         // Se o endpoint atual for a escolha da opção depois do fim de uma atividade
                         else if("fimAtividade".equals(endpoint)){
