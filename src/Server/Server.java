@@ -6,8 +6,9 @@ package Server;
  */
 
 import java.io.IOException;
-import java.net.Socket;
 import java.net.ServerSocket;
+import java.net.Socket;
+import Server.Controller.CampusController;
 import Server.DAO.Factory.Connect;
 
 public class Server {
@@ -16,6 +17,8 @@ public class Server {
     private Socket socketClient;
     // Socket do servidor
     private ServerSocket socketServer;
+    
+    private CampusController campusController;
     
     // Serviço para realização de matrícula
     MatriculaService matricula;
@@ -114,6 +117,15 @@ public class Server {
                             // Manda a resposta para o cliente
                             Connection.send(this.socketClient, res);
                             
+                        }
+                        // Se o cliente mandar alguma das palavras de gatilho para sair, o socket é encerrado
+                        else if(this.checkExit(req)){
+                            // Cria uma frase de despedida
+                            res = "A Universidade Anhembi Morumbi agradece o seu contato. Espero ter alcançado o objetivo do seu contato! :)";
+                            // Manda a resposta para o cliente
+                            Connection.send(this.socketClient, res);
+                            // Fecha a conexão com o cliente
+                            this.socketClient.close();
                         }
                         else if(endpoint.contains("firstcontact")){
                             switch(endpoint){
@@ -265,15 +277,6 @@ public class Server {
                             // Manda a resposta para o cliente
                             Connection.send(this.socketClient, res);
                         }
-                        // Se o cliente mandar alguma das palavras de gatilho para sair, o socket é encerrado
-                        else if(this.checkExit(req)){
-                            // Cria uma frase de despedida
-                            res = "A Universidade Anhembi Morumbi agradece o seu contato. Espero ter alcançado o objetivo do seu contato! :)";
-                            // Manda a resposta para o cliente
-                            Connection.send(this.socketClient, res);
-                            // Fecha a conexão com o cliente
-                            this.socketClient.close();
-                        }
                         // Se não for nem o primeiro contato nem há um gatilho para sair, executa as opções
                         else if((!isAluno && endpoint.equals("") && (req.trim().equals(1) || req.trim().equals("1") || req.trim().equalsIgnoreCase("Matrícula"))) || "matricula".equals(endpoint.split("/")[0])){
                             // Se o usuário escolheu a primeira opção no menu de opções e não está no endpoint da matrícula
@@ -377,6 +380,20 @@ public class Server {
                                 // Manda a resposta para o usuário
                                 Connection.send(this.socketClient, res);
                             }
+                        }
+                        else if((!isAluno && endpoint.equals("") && (req.trim().equals(2) || req.trim().equals("2") || req.trim().equalsIgnoreCase("Campi")))){
+                            this.campusController = new CampusController();
+                            
+                            res = this.campusController.listarCampiInfo();
+                                    
+                            // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                            res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                            // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
+                            endpoint = "fimAtividade";
+                            
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
+                            
                         }
                         // Se a requisição não se enquadrar em nenhuma das opções anteriores
                         else{
