@@ -15,7 +15,7 @@ public class Connection {
     public static String receive(Socket socket) throws IOException {
         InputStream message = socket.getInputStream();
         
-        byte messageBytes[] = new byte[900 ];
+        byte messageBytes[] = new byte[2000];
         
         int readBytes = message.read(messageBytes);
         

@@ -118,9 +118,7 @@ public class RematriculaService {
                     }
                 }
                 else{
-                    resMsg = "rematricula/fechar";
-
-                    resEndpoint = "rematricula/historico";
+                    resEndpoint = "";
 
                     resObj[0] = resMsg;
                     resObj[1] = resEndpoint;
