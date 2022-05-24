@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import Server.Controller.CampusController;
+import Server.Controller.CursoController;
 import Server.DAO.Factory.Connect;
 
 public class Server {
@@ -19,6 +20,8 @@ public class Server {
     private ServerSocket socketServer;
     
     private CampusController campusController;
+    
+    private CursoController cursoController;
     
     // Serviço para realização de matrícula
     MatriculaService matricula;
@@ -385,6 +388,20 @@ public class Server {
                             this.campusController = new CampusController();
                             
                             res = this.campusController.listarCampiInfo();
+                                    
+                            // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                            res += "\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                            // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
+                            endpoint = "fimAtividade";
+                            
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
+                            
+                        }
+                        else if((!isAluno && endpoint.equals("") && (req.trim().equals(3) || req.trim().equals("3") || req.trim().equalsIgnoreCase("Cursos")))){
+                            this.cursoController = new CursoController();
+                            
+                            res = this.cursoController.listarCursosInfo();
                                     
                             // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
                             res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
