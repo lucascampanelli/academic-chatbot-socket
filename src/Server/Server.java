@@ -364,18 +364,44 @@ public class Server {
                             // Manda a resposta para o usuário
                             Connection.send(this.socketClient, res);
                         }
-                        // Se for aluno e enviar a opção de e-mail acadêmico
-                        else if((isAluno && endpoint.equals("") && (req.trim().equals(8) || req.trim().equals("8") || req.trim().equalsIgnoreCase("email academico") || req.trim().equalsIgnoreCase("e-mail academico")))){
+                        // Se for aluno e enviar a opção de horário
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(4) || req.trim().equals("4") || req.trim().equalsIgnoreCase("hor\\ário") || req.trim().equalsIgnoreCase("horario")))){
+                            acompanhamento = new AcompanhamentoService();
                             
-                            res = "\n" + this.auth.getStudentName(ra) + ", o seu e-mail acadêmico é: "
-                                                               + this.auth.getStudentAcademicMail(ra);
+                            // Pega o vetor da resposta do serviço de matrícula.
+                            // No índice 0 é retornado a resposta do serviço e no índice 1 é retornado o endpoint para direcionar o chamado.
+                            String[] acompanhamentoResult = this.acompanhamento.listarHorario(ra);
                             
-                            res += "\nSe for seu primeiro acesso ao e-mail, basta logar na sua conta e cadastrar uma nova senha.\n";
+                            // Armazenando a resposta do serviço de rematrícula
+                            res = acompanhamentoResult[0];
+                            // Armazenando o próximo endpoint a ser executado pelo servidor
+                            endpoint = acompanhamentoResult[1];
                             
-                            // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
-                            res += "\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                            // Se o serviço da rematrícula terminou
+                            if("fimAtividade".equals(endpoint)){
+                                // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                                res += "\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                            }
                             
-                            endpoint = "fimAtividade";
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
+                        }
+                        // Se for aluno e enviar a opção de disciplina
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(5) || req.trim().equals("5") || req.trim().equalsIgnoreCase("disciplinas") || req.trim().equalsIgnoreCase("minhas disciplinas")) || "disciplinas".equals(endpoint.split("/")[0]))){
+                            if(endpoint.equals(""))
+                                endpoint = "disciplinas/listagem";
+                            
+                            acompanhamento = new AcompanhamentoService();
+                            
+                            String[] disciplinasResult = this.acompanhamento.listarDisciplinas(ra, req, endpoint);
+                            
+                            res = "\n" + disciplinasResult[0];
+                            
+                            endpoint = disciplinasResult[1];
+                            
+                            if("fimAtividade".equalsIgnoreCase(endpoint))
+                                // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                                res += "O que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
                             
                             // Manda a resposta para o usuário
                             Connection.send(this.socketClient, res);

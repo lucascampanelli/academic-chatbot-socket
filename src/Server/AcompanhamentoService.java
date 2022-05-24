@@ -53,4 +53,85 @@ public class AcompanhamentoService {
 
         return resObj;
     }
+    
+    public String[] listarDisciplinas(int ra, String req, String endpoint){
+        
+        String[] resObj = new String[2];
+        String resMsg = "";
+        String resEndpoint = "";
+        
+        switch(endpoint){
+            case "disciplinas/listagem":
+                alunoController = new AlunoController();
+                
+                String disciplinas = this.alunoController.listarDisciplinas(ra, Integer.parseInt(this.alunoController.obterDadoAluno(ra, "semestreAtual")));
+                
+                if(!(disciplinas.contains("erro")) && !(disciplinas.equals(""))){
+                    resMsg = this.alunoController.obterDadoAluno(ra, "nome") + ", "
+                        + "esse semestre você cursará a(s) seguinte(s) UC(s):\n";
+                
+                    resMsg += disciplinas;
+                }
+                else{
+                    resMsg = "\nVocê não possui nenhuma UC a ser cursada nesse semestre.\n";
+                }
+                
+                resMsg += "\n O que você deseja fazer agora?\n"
+                        + "1- Visualizar disciplinas anteriores      |      2- Contatar o professor      |      3- Sair";
+                
+                resEndpoint = "disciplinas/opcao";
+                
+                resObj[0] = resMsg;
+                resObj[1] = resEndpoint;
+                
+                return resObj;
+            
+            case "disciplinas/opcao":
+                    alunoController = new AlunoController();
+                    
+                    if("1".equalsIgnoreCase(req.trim()) || "visualizar disciplinas anteriores".equalsIgnoreCase(req.trim()) || "anteriores".equalsIgnoreCase(req.trim())){
+
+                        String disciplinasAnteriores = this.alunoController.listarDisciplinas(ra, Integer.parseInt(this.alunoController.obterDadoAluno(ra, "semestreAtual")));
+
+                        if(!(disciplinasAnteriores.contains("erro")) && !(disciplinasAnteriores.equals(""))){
+                            resMsg += "\n" + disciplinasAnteriores;
+                        }
+                        else{
+                            resMsg = "\nNão foi possível obter o seu histórico. Tente novamente mais tarde.\n";
+                        }
+
+                        resEndpoint = "fimAtividade";
+
+                        resObj[0] = resMsg;
+                        resObj[1] = resEndpoint;
+
+                        return resObj;
+                        
+                    }
+                    if("2".equalsIgnoreCase(req.trim()) || "Contatar o professor".equalsIgnoreCase(req.trim()) || "contatar".equalsIgnoreCase(req.trim())){
+
+                        resMsg = "\nQual professor você deseja entrar em contato? Informe-me o nome do professor ou da disciplina relacionada.\n";
+
+                        resEndpoint = "disciplinas/contato";
+
+                        resObj[0] = resMsg;
+                        resObj[1] = resEndpoint;
+
+                        return resObj;
+                        
+                    }
+                    if("3".equalsIgnoreCase(req.trim()) || "Sair".equalsIgnoreCase(req.trim()) || "sair".equalsIgnoreCase(req.trim())){
+
+                        resEndpoint = "fimAtividade";
+
+                        resObj[0] = resMsg;
+                        resObj[1] = resEndpoint;
+
+                        return resObj;
+                        
+                    }
+        }
+        
+        return resObj;
+    }
 }

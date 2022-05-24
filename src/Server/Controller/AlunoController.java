@@ -3,12 +3,15 @@ package Server.Controller;
 import Server.DAO.DaoAluno;
 import Server.DAO.DaoBoleto;
 import Server.DAO.DaoCurriculo;
+import Server.DAO.DaoDocencia;
 import Server.DAO.DaoHistorico;
+import Server.DAO.DaoProfessor;
 import Server.DAO.DaoUC;
 import Server.Model.AlunoModel;
 import Server.Model.BoletoModel;
 import Server.Model.CurriculoModel;
 import Server.Model.HistoricoModel;
+import Server.Model.ProfessorModel;
 import Server.Model.UCModel;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,7 +27,9 @@ public class AlunoController {
     private DaoAluno DAOAluno;
     private DaoBoleto DAOBoleto;
     private DaoCurriculo DAOCurriculo;
+    private DaoDocencia DAODocencia;
     private DaoHistorico DAOHistorico;
+    private DaoProfessor DAOProfessor;
     private DaoUC DAOUC;
     
     public Response realizarMatricula(int cursoID, String nome, String sobrenome,
@@ -454,6 +459,79 @@ public class AlunoController {
         }
         
         return "\nNão há nenhuma aula agendada para hoje.\n";
+    }
+    
+    public String listarDisciplinas(int ra){
+        this.DAOHistorico = new DaoHistorico();
+        
+        ArrayList<HistoricoModel> historico = new ArrayList<>();
+        
+        historico = this.DAOHistorico.listarHistoricoAluno(ra);
+        
+        if(historico == null)
+            return "Não há UCs ativas para esse semestre.";
+        
+        this.DAOUC = new DaoUC();
+        
+        String res = "";
+        
+        for(int i = 0; i < historico.size(); i++){
+            UCModel uc = this.DAOUC.obterUC(historico.get(i).getUcID());
+            
+            if(uc == null)
+                return "Ocorreu um erro inesperado ao listar o seu horário. Tente novamente mais tarde.";
+            
+            DaoDocencia DAODocencia = new DaoDocencia();
+            DaoProfessor DAOProfessor = new DaoProfessor();
+            
+            int idProfessor = this.DAODocencia.obterProfessorDisciplina(uc.getID(), historico.get(i).getDiaSemana());
+            
+            ProfessorModel professor = this.DAOProfessor.obterProfessor(idProfessor);
+            
+            res += uc.getNome() + " - " + uc.getObjetivo() + " | " + uc.getMetodo() + ";\n"
+                                    + "O professor dessa UC é " + professor.getNome() + " " 
+                                                         + professor.getSobrenome() + "\n";
+        }
+        
+        return res;
+    }
+    
+    public String listarDisciplinas(int ra, int semestre){
+        this.DAOHistorico = new DaoHistorico();
+        
+        ArrayList<HistoricoModel> historico = new ArrayList<>();
+        
+        historico = this.DAOHistorico.listarHistoricoAluno(ra, semestre);
+        
+        if(historico == null)
+            return "Não há UCs ativas para esse semestre.";
+        
+        this.DAOUC = new DaoUC();
+        
+        String res = "";
+        
+        for(int i = 0; i < historico.size(); i++){
+            UCModel uc = this.DAOUC.obterUC(historico.get(i).getUcID());
+            
+            if(uc == null)
+                return "Ocorreu um erro inesperado ao listar o seu horário. Tente novamente mais tarde.";
+            
+            this.DAODocencia = new DaoDocencia();
+            this.DAOProfessor = new DaoProfessor();
+            
+            int idProfessor = this.DAODocencia.obterProfessorDisciplina(uc.getID(), historico.get(i).getDiaSemana());
+            
+            if(idProfessor == -1)
+                return "Ocorreu um erro inesperado ao listar o seu horário. Tente novamente mais tarde.";
+            
+            ProfessorModel professor = this.DAOProfessor.obterProfessor(idProfessor);
+            
+            res += uc.getNome() + " - " + uc.getObjetivo() + " | " + uc.getMetodo() + ";\n"
+                                    + "O professor dessa UC é " + professor.getNome() + " " 
+                                                         + professor.getSobrenome() + "\n";
+        }
+        
+        return res;
     }
     
 }
