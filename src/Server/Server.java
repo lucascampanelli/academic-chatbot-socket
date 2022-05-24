@@ -23,6 +23,9 @@ public class Server {
     
     private CursoController cursoController;
     
+    // Serviço para acompanhamentos relacionados às disciplinas
+    AcompanhamentoService acompanhamento;
+    
     // Serviço para realização de matrícula
     MatriculaService matricula;
     
@@ -31,7 +34,6 @@ public class Server {
     
     // Serviço para autenticação do usuário
     AuthService auth;
-   
     
     // Verifica se o client realizou o connect com o server e faz o accept
     private boolean connectExists(){
@@ -333,6 +335,28 @@ public class Server {
                                 res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
                                 // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
                                 endpoint = "fimAtividade";
+                            }
+                            
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
+                        }
+                        // Se for aluno e enviar a opção de rematrícula
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(4) || req.trim().equals("4") || req.trim().equalsIgnoreCase("hor\\ário") || req.trim().equalsIgnoreCase("horario")))){
+                            acompanhamento = new AcompanhamentoService();
+                            
+                            // Pega o vetor da resposta do serviço de matrícula.
+                            // No índice 0 é retornado a resposta do serviço e no índice 1 é retornado o endpoint para direcionar o chamado.
+                            String[] acompanhamentoResult = this.acompanhamento.listarHorario(ra);
+                            
+                            // Armazenando a resposta do serviço de rematrícula
+                            res = acompanhamentoResult[0];
+                            // Armazenando o próximo endpoint a ser executado pelo servidor
+                            endpoint = acompanhamentoResult[1];
+                            
+                            // Se o serviço da rematrícula terminou
+                            if("fimAtividade".equals(endpoint)){
+                                // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                                res += "\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
                             }
                             
                             // Manda a resposta para o usuário

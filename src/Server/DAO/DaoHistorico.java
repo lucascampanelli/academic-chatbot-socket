@@ -44,4 +44,74 @@ public class DaoHistorico {
         }
     }
     
+    public ArrayList<HistoricoModel> listarHistoricoAluno(int ra){
+        try{
+            String sql = "SELECT * FROM Historico WHERE alunoID = " + ra + ";";
+            
+            ResultSet resultado = Connect.getPreparedStatement(sql).executeQuery();
+            
+            ArrayList<HistoricoModel> historico = new ArrayList<>();
+            
+            while(resultado.next()){
+                HistoricoModel historicoModelo = new HistoricoModel(resultado.getInt("ID"), 
+                                                                    resultado.getInt("semestre"), 
+                                                                    resultado.getString("Historico"), 
+                                                                    resultado.getInt("nota1"), 
+                                                                    resultado.getInt("nota2"), 
+                                                                    resultado.getInt("nota3"), 
+                                                                    resultado.getInt("notaFinal"), 
+                                                                    resultado.getInt("faltas"), 
+                                                                    resultado.getInt("cargaHoraria"), 
+                                                                    resultado.getInt("credito"), 
+                                                                    resultado.getString("situacao"), 
+                                                                    resultado.getString("diaSemana"), 
+                                                                    resultado.getInt("ucID"), 
+                                                                    resultado.getInt("alunoID"));
+                
+                historico.add(historicoModelo);
+            }
+            
+            return historico;
+        }
+        catch(SQLException e){
+            System.out.println("Ocorreu um erro ao buscar o histórico do aluno informado.\nDetalhes do erro: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    public ArrayList<HistoricoModel> listarHistoricoAluno(int ra, int semestre){
+        try{
+            String sql = "SELECT * FROM Historico WHERE alunoID = " + ra + " and semestre = " + semestre + ";";
+            
+            ResultSet resultado = Connect.getPreparedStatement(sql).executeQuery();
+            
+            ArrayList<HistoricoModel> historico = new ArrayList<>();
+            
+            while(resultado.next()){
+                HistoricoModel historicoModelo = new HistoricoModel(resultado.getInt("ID"), 
+                                                                    resultado.getInt("semestre"), 
+                                                                    resultado.getString("tipoOcorrencia"), 
+                                                                    resultado.getInt("nota1"), 
+                                                                    resultado.getInt("nota2"), 
+                                                                    resultado.getInt("nota3"), 
+                                                                    resultado.getInt("notaFinal"), 
+                                                                    resultado.getInt("faltas"), 
+                                                                    resultado.getInt("cargaHoraria"), 
+                                                                    resultado.getInt("credito"), 
+                                                                    resultado.getString("situacao"), 
+                                                                    resultado.getString("diaSemana"), 
+                                                                    resultado.getInt("ucID"), 
+                                                                    resultado.getInt("alunoID"));
+                
+                historico.add(historicoModelo);
+            }
+            
+            return historico;
+        }
+        catch(SQLException e){
+            System.out.println("Ocorreu um erro ao buscar o histórico do aluno informado.\nDetalhes do erro: " + e.getMessage());
+            return null;
+        }
+    }
+    
 }

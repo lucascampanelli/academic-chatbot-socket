@@ -4,13 +4,16 @@ import Server.DAO.DaoAluno;
 import Server.DAO.DaoBoleto;
 import Server.DAO.DaoCurriculo;
 import Server.DAO.DaoHistorico;
+import Server.DAO.DaoUC;
 import Server.Model.AlunoModel;
 import Server.Model.BoletoModel;
 import Server.Model.CurriculoModel;
 import Server.Model.HistoricoModel;
+import Server.Model.UCModel;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -19,9 +22,10 @@ import java.util.ArrayList;
 public class AlunoController {
     
     private DaoAluno DAOAluno;
+    private DaoBoleto DAOBoleto;
     private DaoCurriculo DAOCurriculo;
     private DaoHistorico DAOHistorico;
-    private DaoBoleto DAOBoleto;
+    private DaoUC DAOUC;
     
     public Response realizarMatricula(int cursoID, String nome, String sobrenome,
                                       String rg, String cpf, String sexo,
@@ -365,6 +369,91 @@ public class AlunoController {
         resposta.setMessage("\n" + this.obterDadoAluno(ra, "nome") + ", sua rematrícula foi realizada com sucesso! Seu novo horário das disciplinas já está disponível para consulta.");
         
         return resposta;
+    }
+    
+    public String listarHorario(int ra){
+        this.DAOHistorico = new DaoHistorico();
+        
+        ArrayList<HistoricoModel> historico = new ArrayList<>();
+        
+        historico = this.DAOHistorico.listarHistoricoAluno(ra, 
+                                                           Integer.parseInt(
+                                                                   this.obterDadoAluno(ra, "semestreAtual")
+                                                           )
+                                                           );
+        
+        if(historico == null)
+            return "Não há UCs ativas para esse semestre.";
+        
+        this.DAOUC = new DaoUC();
+        
+        String res = "";
+        
+        for(int i = 0; i < historico.size(); i++){
+            UCModel uc = this.DAOUC.obterUC(historico.get(i).getUcID());
+            
+            if(uc == null)
+                return "Ocorreu um erro inesperado ao listar o seu horário. Tente novamente mais tarde.";
+            
+            res += historico.get(i).getDiaSemana() + " - " + uc.getNome() + " (" + uc.getHoraInicio() + " até " + uc.getHoraFim() + ") | " + uc.getLocal() + ";\n";
+        }
+        
+        return res;
+    }
+    
+    public String obterLinkAula(int ra){
+        // Criando uma instância do calendário
+        Calendar c = Calendar.getInstance();
+        // Variável que armazenará o número do dia da semana
+        int diaSemana = c.get(Calendar.DAY_OF_WEEK);
+        // Variável que armazenará o dia da semana em string
+        String diaSemanaTxt = "";
+        
+        this.DAOHistorico = new DaoHistorico();
+        
+        ArrayList<HistoricoModel> historico = this.DAOHistorico.listarHistoricoAluno(ra, 
+                                                           Integer.parseInt(
+                                                                   this.obterDadoAluno(ra, "semestreAtual")
+                                                           )
+                                                           );
+        
+        if(historico == null)
+            return "Não há UCs ativas para esse semestre.";
+        
+        this.DAOUC = new DaoUC();
+        
+        if(diaSemana == 1)
+            diaSemanaTxt = "Domingo";
+        
+        if(diaSemana == 2)
+            diaSemanaTxt = "Segunda-Feira";
+        
+        if(diaSemana == 3)
+            diaSemanaTxt = "Terça-Feira";
+        
+        if(diaSemana == 4)
+            diaSemanaTxt = "Quarta-Feira";
+        
+        if(diaSemana == 5)
+            diaSemanaTxt = "Quinta-Feira";
+        
+        if(diaSemana == 6)
+            diaSemanaTxt = "Sexta-Feira";
+        
+        if(diaSemana == 7)
+            diaSemanaTxt = "Sábado";
+        
+        for(int i = 0; i < historico.size(); i++){
+            UCModel uc = this.DAOUC.obterUC(historico.get(i).getUcID());
+            
+            if(uc == null)
+                return "\nOcorreu um erro inesperado ao obter o link da aula de hoje. Tente novamente mais tarde.\n";
+        
+            if(historico.get(i).getDiaSemana().equals(diaSemanaTxt))
+                return uc.getEndAula();
+        }
+        
+        return "\nNão há nenhuma aula agendada para hoje.\n";
     }
     
 }
