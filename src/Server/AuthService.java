@@ -27,4 +27,8 @@ public class AuthService {
     public String getStudentName(int ra){
         return this.alunoController.obterDadoAluno(ra, "nome");
     }
+    
+    public String getStudentAcademicMail(int ra){
+        return this.alunoController.obterDadoAluno(ra, "emailInsti");
+    }
 }

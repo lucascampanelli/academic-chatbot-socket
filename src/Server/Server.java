@@ -239,7 +239,8 @@ public class Server {
                                                               + "\n4- Horário"
                                                                 + "\n5- Disciplinas"
                                                                   + "\n6- Solicitações"
-                                                                    + "\n7 - Meus boletos";
+                                                                    + "\n7 - Meus boletos"
+                                                                      + "\n8 - Meu e-mail acadêmico";
 
                                             // Manda a resposta para o cliente
                                             Connection.send(this.socketClient, res);
@@ -268,7 +269,8 @@ public class Server {
                                                   + "\n4- Horário"
                                                     + "\n5- Disciplinas"
                                                       + "\n6- Solicitações"
-                                                        + "\n7 - Meus boletos";   
+                                                        + "\n7 - Meus boletos"
+                                                          + "\n8 - Meu e-mail acadêmico";
                                 }
                             else{
                                 // Mensagem com as opções do menu
@@ -340,7 +342,7 @@ public class Server {
                             // Manda a resposta para o usuário
                             Connection.send(this.socketClient, res);
                         }
-                        // Se for aluno e enviar a opção de rematrícula
+                        // Se for aluno e enviar a opção de horário
                         else if((isAluno && endpoint.equals("") && (req.trim().equals(4) || req.trim().equals("4") || req.trim().equalsIgnoreCase("hor\\ário") || req.trim().equalsIgnoreCase("horario")))){
                             acompanhamento = new AcompanhamentoService();
                             
@@ -362,6 +364,23 @@ public class Server {
                             // Manda a resposta para o usuário
                             Connection.send(this.socketClient, res);
                         }
+                        // Se for aluno e enviar a opção de e-mail acadêmico
+                        else if((isAluno && endpoint.equals("") && (req.trim().equals(8) || req.trim().equals("8") || req.trim().equalsIgnoreCase("email academico") || req.trim().equalsIgnoreCase("e-mail academico")))){
+                            
+                            res = "\n" + this.auth.getStudentName(ra) + ", o seu e-mail acadêmico é: "
+                                                               + this.auth.getStudentAcademicMail(ra);
+                            
+                            res += "\nSe for seu primeiro acesso ao e-mail, basta logar na sua conta e cadastrar uma nova senha.\n";
+                            
+                            // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
+                            res += "\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
+                            
+                            endpoint = "fimAtividade";
+                            
+                            // Manda a resposta para o usuário
+                            Connection.send(this.socketClient, res);
+                            
+                        }
                         // Se o endpoint atual for a escolha da opção depois do fim de uma atividade
                         else if("fimAtividade".equals(endpoint)){
                             // Se o usuário escolheu a primeira opção, listar o menu novamente
@@ -377,7 +396,8 @@ public class Server {
                                                       + "\n4- Horário"
                                                         + "\n5- Disciplinas"
                                                           + "\n6- Solicitações"
-                                                            + "\n7 - Meus boletos";
+                                                            + "\n7 - Meus boletos"
+                                                              + "\n8 - Meu e-mail acadêmico";
                                 else
                                     // Mensagem com as opções do menu
                                     res = "\n\nDigite qual a sua dúvida e eu vou te responder."
