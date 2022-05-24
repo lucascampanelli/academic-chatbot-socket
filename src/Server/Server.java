@@ -298,8 +298,11 @@ public class Server {
                             
                             // Se o serviço da matrícula terminou
                             if("".equals(endpoint)){
-                                if(res.contains("sua matrícula foi realizada com sucesso"))
+                                if(res.contains("sua matrícula foi realizada com sucesso")){
                                     isAluno = true;
+                                    ra = Integer.parseInt((res.split("Seu RA é ")[1].split("\\.")[0]).trim());
+                                }
+                                    
                                 // Adiciona na variável de resposta a pergunta para o usuário informar se deseja encerrar o chamado
                                 res += "\n\nO que você deseja fazer agora? Escoha uma opção:\n1- Menu      |      2- Sair";
                                 // Adicionando um endpoint para gerenciar a resposta do usuário em relação a próxima etapa
